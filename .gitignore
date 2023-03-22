@@ -130,5 +130,4 @@ dmypy.json
 
 .venv/
 model/EnBert/en_Bert_onnx
-model/RuBert/ru_Bert_onnx
 
