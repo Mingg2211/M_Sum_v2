@@ -129,7 +129,6 @@ dmypy.json
 .pyre/
 
 .venv/
-model/ChBert/ch_Bert_onnx
 model/EnBert/en_Bert_onnx
 model/RuBert/ru_Bert_onnx
 
