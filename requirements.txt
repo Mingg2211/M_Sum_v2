@@ -35,3 +35,4 @@ underthesea==6.1.2
 underthesea-core==0.0.5a2
 urllib3==1.26.14
 zipp==3.14.0
+pycountry
