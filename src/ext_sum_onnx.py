@@ -146,11 +146,16 @@ class M_Sum():
         description = news['description']
         paras = news['paras']
         if self.lang == 'ch':
-            paras = [s.replace('\n','').replace('\u3000',' ').strip() for s in re.split('[。！？；]', doc)]
+            if '\n\n' not in paras:
+                paras = [s.replace('\u3000',' ').strip() for s in re.split('[。！？；]', paras)]
+            else:
+                paras = paras.split('\n\n')
         else :
-            paras = sent_tokenize(paras)
-            paras = [s.replace('\n','').strip() for s in paras]
-        print(paras)       
+            if '\n\n' not in paras:
+                paras = sent_tokenize(paras)
+                paras = [s.strip() for s in paras]
+            else: 
+                paras = paras.split('\n\n')
         if title.strip() != "" and description.strip() != "":
             input_id_title = self.tokenizer(title, return_tensors="pt")
             inputs_title_onnx = {k: v.cpu().detach().numpy() for k, v in input_id_title.items()}
@@ -242,68 +247,68 @@ class M_Sum():
             return '\n\n'.join(result)
 
 
-if __name__ == '__main__':    
-    vi_summ = M_Sum()
-    doc = """Khi được hỏi về nguy cơ tiềm ẩn đối với khu vực phía nam của Ukraine trước cuộc tấn công quy mô lớn sắp xảy ra của Nga, Bộ trưởng Quốc phòng Ukraine Oleksii Reznikov hôm 12/2 cho biết Ukraine tìm cách ngăn Nga kiểm soát Biển Đen - vùng biển chiến lược trong chiến dịch quân sự của Nga ở Ukraine.
+# if __name__ == '__main__':    
+#     vi_summ = M_Sum()
+#     doc = """Khi được hỏi về nguy cơ tiềm ẩn đối với khu vực phía nam của Ukraine trước cuộc tấn công quy mô lớn sắp xảy ra của Nga, Bộ trưởng Quốc phòng Ukraine Oleksii Reznikov hôm 12/2 cho biết Ukraine tìm cách ngăn Nga kiểm soát Biển Đen - vùng biển chiến lược trong chiến dịch quân sự của Nga ở Ukraine.
 
-"Tôi thực sự không thích đưa ra dự đoán hay đánh giá ý kiến, nhưng để kiểm soát Odessa và khu vực (phía nam) nói chung, Nga phải chiếm ưu thế trên Biển Đen. Tuy nhiên, chúng tôi đã tước đi cơ hội này của họ", Bộ trưởng Reznikov nói trong một cuộc họp báo.
+# "Tôi thực sự không thích đưa ra dự đoán hay đánh giá ý kiến, nhưng để kiểm soát Odessa và khu vực (phía nam) nói chung, Nga phải chiếm ưu thế trên Biển Đen. Tuy nhiên, chúng tôi đã tước đi cơ hội này của họ", Bộ trưởng Reznikov nói trong một cuộc họp báo.
 
-Odessa là thành phố đông dân thứ 3 của Ukraine và là một trung tâm du lịch, thương mại lớn nằm trên bờ Tây Bắc Biển Đen. Odessa cũng là điểm trung chuyển lớn với 3 thương cảng, đồng thời là ngã ba đường sắt lớn nhất phía Nam Ukraine, do đó Odessa có ý nghĩa quan trọng chiến lược không chỉ về thương mại mà cả quy hoạch quân sự. Odessa cũng là nơi đặt Bộ Tư lệnh Hải quân của quân đội Ukraine."""
-    news = {'title':'',
-            'description':'',
-            'paras':doc}
-    s1 = vi_summ.sum_main(news,0.4)
-    print(s1)
-    print('----------------------------------------------------------------')
-    ###############################
-    en_summ = M_Sum(lang='en')
-    doc = """
-    Yevgeny Prigozhin, the combative boss of Russia’s Wagner private military group, relishes his role as an anti-establishment maverick, but signs are growing that the Moscow establishment now has him pinned down and gasping for breath.
+# Odessa là thành phố đông dân thứ 3 của Ukraine và là một trung tâm du lịch, thương mại lớn nằm trên bờ Tây Bắc Biển Đen. Odessa cũng là điểm trung chuyển lớn với 3 thương cảng, đồng thời là ngã ba đường sắt lớn nhất phía Nam Ukraine, do đó Odessa có ý nghĩa quan trọng chiến lược không chỉ về thương mại mà cả quy hoạch quân sự. Odessa cũng là nơi đặt Bộ Tư lệnh Hải quân của quân đội Ukraine."""
+#     news = {'title':'',
+#             'description':'',
+#             'paras':doc}
+#     s1 = vi_summ.sum_main(news,0.4)
+#     print(s1)
+#     print('----------------------------------------------------------------')
+#     ###############################
+#     en_summ = M_Sum(lang='en')
+#     doc = """
+#     Yevgeny Prigozhin, the combative boss of Russia’s Wagner private military group, relishes his role as an anti-establishment maverick, but signs are growing that the Moscow establishment now has him pinned down and gasping for breath.
 
-Prigozhin placed a bet on his mercenaries raising the Russian flag in the eastern Ukrainian city of Bakhmut, albeit at a considerable cost to the ranks of his force and probably to his own fortune.
+# Prigozhin placed a bet on his mercenaries raising the Russian flag in the eastern Ukrainian city of Bakhmut, albeit at a considerable cost to the ranks of his force and probably to his own fortune.
 
-He spent heavily on recruiting as many as 40,000 prisoners to throw into the fight, but after months of grinding battle and staggering losses he is struggling to replenish Wagner’s ranks, all the while accusing Russia’s Ministry of Defense of trying to strangle his force.
+# He spent heavily on recruiting as many as 40,000 prisoners to throw into the fight, but after months of grinding battle and staggering losses he is struggling to replenish Wagner’s ranks, all the while accusing Russia’s Ministry of Defense of trying to strangle his force.
 
-Many analysts think his suspicions are well-founded – that Russia’s military establishment is using the Bakhmut “meat-grinder” to cut him down to size or eliminate him as a political force altogether.
+# Many analysts think his suspicions are well-founded – that Russia’s military establishment is using the Bakhmut “meat-grinder” to cut him down to size or eliminate him as a political force altogether.
 
-At the weekend, Prigozhin acknowledged that the battle in Bakhmut was “difficult, very difficult, with the enemy fighting for each meter.”
+# At the weekend, Prigozhin acknowledged that the battle in Bakhmut was “difficult, very difficult, with the enemy fighting for each meter.”
 
-In another video message, Prigozhin said: “We need the military to shield the approaches (to Bakhmut). If they manage to do so, everything will be okay. If not, then Wagner will be encircled together with the Ukrainians inside Bakhmut.”
-    """
-    news = {'title':'',
-            'description':'',
-            'paras':doc}
-    s2 = en_summ.sum_main(news,0.4)
-    print(s2)
-    print('----------------------------------------------------------------')
+# In another video message, Prigozhin said: “We need the military to shield the approaches (to Bakhmut). If they manage to do so, everything will be okay. If not, then Wagner will be encircled together with the Ukrainians inside Bakhmut.”
+#     """
+#     news = {'title':'',
+#             'description':'',
+#             'paras':doc}
+#     s2 = en_summ.sum_main(news,0.4)
+#     print(s2)
+#     print('----------------------------------------------------------------')
     
-    ##################################
-    ru_summ = M_Sum(lang='ru')
-    doc = """
-    В суде Лерчек и ее супруг просили суд не лишать из интернета, поскольку на нем завязан весь их бизнес - помимо самого блога это еще и фирма по производству косметики. Чекалин объявил, что у них официально трудоустроены 250 человек.
+#     ##################################
+#     ru_summ = M_Sum(lang='ru')
+#     doc = """
+#     В суде Лерчек и ее супруг просили суд не лишать из интернета, поскольку на нем завязан весь их бизнес - помимо самого блога это еще и фирма по производству косметики. Чекалин объявил, что у них официально трудоустроены 250 человек.
 
-Но судья согласилась с доводами следствия: с помощью интернета, мобильной и телефонной связи супруги могут оказывать влияние на свидетелей.
+# Но судья согласилась с доводами следствия: с помощью интернета, мобильной и телефонной связи супруги могут оказывать влияние на свидетелей.
 
-Валерия уехала домой сразу после заседания, а Артему (решение по нему выносилось отдельно) пришлось задержаться.
-    """
-    news = {'title':'',
-            'description':'',
-            'paras':doc}
-    s3 = ru_summ.sum_main(news,0.4)
-    print(s3)
-    print('----------------------------------------------------------------')
+# Валерия уехала домой сразу после заседания, а Артему (решение по нему выносилось отдельно) пришлось задержаться.
+#     """
+#     news = {'title':'',
+#             'description':'',
+#             'paras':doc}
+#     s3 = ru_summ.sum_main(news,0.4)
+#     print(s3)
+#     print('----------------------------------------------------------------')
     
-    #########################################
-    ch_summ = M_Sum(lang='ch')
-    doc = """
-    　新华社北京3月15日电（记者彭韵佳、沐铁城）为加强医疗保障基金监督检查，规范飞行检查工作，国家医保局近日印发《医疗保障基金飞行检查管理暂行办法》，自2023年5月1日起施行。
+#     #########################################
+#     ch_summ = M_Sum(lang='ch')
+#     doc = """
+#     　新华社北京3月15日电（记者彭韵佳、沐铁城）为加强医疗保障基金监督检查，规范飞行检查工作，国家医保局近日印发《医疗保障基金飞行检查管理暂行办法》，自2023年5月1日起施行。
 
-　　办法明确，有下列情形之一的，医疗保障行政部门可以启动飞行检查，包括年度工作计划安排的；举报线索反映医疗保障基金可能存在重大安全风险的；医疗保障智能监控或者大数据筛查提示医疗保障基金可能存在重大安全风险的；新闻媒体曝光，造成重大社会影响的；其他需要开展飞行检查的情形。
+# 　　办法明确，有下列情形之一的，医疗保障行政部门可以启动飞行检查，包括年度工作计划安排的；举报线索反映医疗保障基金可能存在重大安全风险的；医疗保障智能监控或者大数据筛查提示医疗保障基金可能存在重大安全风险的；新闻媒体曝光，造成重大社会影响的；其他需要开展飞行检查的情形。
 
-　　办法提出，被检地医疗保障行政部门应当在收到移交材料的30个工作日内，将处理进度和整改方案上报组织飞行检查的医疗保障行政部门，并在处理完结后5个工作日内报送书面报告。此外，组织飞行检查的医疗保障行政部门应当及时将典型案例向社会公告。
-    """
-    news = {'title':'',
-            'description':'',
-            'paras':doc}
-    s4 = ch_summ.sum_main(news,0.4)
-    print(s4)
+# 　　办法提出，被检地医疗保障行政部门应当在收到移交材料的30个工作日内，将处理进度和整改方案上报组织飞行检查的医疗保障行政部门，并在处理完结后5个工作日内报送书面报告。此外，组织飞行检查的医疗保障行政部门应当及时将典型案例向社会公告。
+#     """
+#     news = {'title':'',
+#             'description':'',
+#             'paras':doc}
+#     s4 = ch_summ.sum_main(news,0.4)
+#     print(s4)

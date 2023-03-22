@@ -8,9 +8,9 @@ import string
 import zipfile
 
 import nltk
-
-from _compat import to_string, to_unicode, unicode
-from utils import normalize_language
+from underthesea import sent_tokenize
+from .._compat import to_string, to_unicode, unicode
+from ..utils import normalize_language
 
 class DefaultWordTokenizer(object):
     """NLTK tokenizer"""
@@ -43,11 +43,20 @@ class RussianWordTokenizer:
         return nltk.word_tokenize(text, language='russian')
 class VietNameseSentencesTokenizer:
     def tokenize(self, text):
-        try:
-            from underthesea import sent_tokenize
-        except ImportError as e:
-            raise ValueError("VietNamese tokenizer requires underthesea. Please, install it by command 'pip install underthesea'.")
-        return sent_tokenize(text)
+        if '\n\n'  not in text:
+            return sent_tokenize(text)
+        else:
+            list_sent = text.split('\n\n')
+            return list_sent
+
+class ChineseSentencesTokenizer():
+    def tokenize(self, text):
+        if '\n\n'  not in text:
+            list_sent = [s.replace('\u3000',' ').strip() for s in re.split('[。！？；]', text)]
+            return list_sent
+        else:
+            list_sent = text.split('\n\n')
+            return list_sent
 
 class Tokenizer(object):
     """Language dependent tokenizer of text document."""
@@ -67,9 +76,10 @@ class Tokenizer(object):
     }
 
     SPECIAL_SENTENCE_TOKENIZERS = {
-        'russian': nltk.RegexpTokenizer(r'[.!?…»]', gaps=True),
-        'chinese': nltk.RegexpTokenizer('[^　！？。]*[！？。]'),
+        'russian': VietNameseSentencesTokenizer(),
+        'english': VietNameseSentencesTokenizer(),
         'vietnamese' : VietNameseSentencesTokenizer(),
+        'chinese': ChineseSentencesTokenizer(),
     }
 
     SPECIAL_WORD_TOKENIZERS = {
@@ -94,15 +104,6 @@ class Tokenizer(object):
     def _get_sentence_tokenizer(self, language):
         if language in self.SPECIAL_SENTENCE_TOKENIZERS:
             return self.SPECIAL_SENTENCE_TOKENIZERS[language]
-        try:
-            path = to_string("tokenizers/punkt/%s.pickle") % to_string(language)
-            return nltk.data.load(path)
-        except (LookupError, zipfile.BadZipfile) as e:
-            raise LookupError(
-                "NLTK tokenizers are missing or the language is not supported.\n"
-                """Download them by following command: python -c "import nltk; nltk.download('punkt')"\n"""
-                "Original error was:\n" + str(e)
-            )
 
     def _get_word_tokenizer(self, language):
         if language in self.SPECIAL_WORD_TOKENIZERS:
@@ -110,11 +111,20 @@ class Tokenizer(object):
         else:
             return DefaultWordTokenizer()
 
+    
+    def flatten_list(self, list):
+        tmp = (" ".join([str(item) for item in list]))
+        res = []
+        return res.append(tmp)
+
     def to_sentences(self, paragraph):
         if hasattr(self._sentence_tokenizer, '_params'):
             extra_abbreviations = self.LANGUAGE_EXTRA_ABREVS.get(self._language, [])
             self._sentence_tokenizer._params.abbrev_types.update(extra_abbreviations)
         sentences = self._sentence_tokenizer.tokenize(to_unicode(paragraph))
+        # print('----------')
+        # print(sentences)
+        # print(type(sentences))
         return tuple(map(unicode.strip, sentences))
 
     def to_words(self, sentence):
@@ -124,3 +134,11 @@ class Tokenizer(object):
     @staticmethod
     def _is_word(word):
         return bool(Tokenizer._WORD_PATTERN.match(word))
+
+
+# mingg = Tokenizer(language='vietnamese')
+# doc = """
+# PGS.TS Lê Hoàng Sơn công bố hơn 180 công trình, bài báo trên các tạp chí nước ngoài trong danh mục ISI. Ông là gương mặt lọt vào top 10.000 nhà khoa học xuất sắc của thế giới trong 4 năm liên tiếp 2019, 2020, 2021, 2022, đồng thời được gắn huy hiệu "Rising Star" - ngôi sao khoa học đang lên xuất sắc trên thế giới năm 2022.\n\nLĩnh vực Kỹ thuật và Công nghệ tiếp tục có GS.TSKH Nguyễn Đình Đức, ĐHQGHN. Ông là một trong những nhà khoa học đầu ngành của Việt Nam trong lĩnh vực Cơ học và vật liệu composite. Ông đã công bố trên 300 công trình khoa học, trong đó có 200 bài trên các tạp chí quốc tế ISI có uy tín. Bốn năm liên tiếp 2019, 2020, 2021 và 2022 ông lọt vào top 100.000 nhà khoa học có ảnh hưởng nhất thế giới. GS. Nguyễn Đình Đức vào tốp 94 thế giới trong lĩnh vực Engineering năm 2022, tức tốp 100 thế giới.\n\nLĩnh vực Khoa học Môi trường có GS.TS Phạm Hùng Việt và PGS.TS Từ Bình Minh, đều từ Trường Đại học Khoa học Tự nhiên, ĐHQGHN. GS. Phạm Hùng Việt hiện là Giám đốc Phòng thí nghiệm trọng điểm Công nghệ phân tích phục vụ kiểm định môi trường và An toàn thực phẩm, Trưởng nhóm nghiên cứu mạnh. Ông có hơn 100 công trình, bài báo công bố, sở hữu nhiều bằng sáng chế.\n\nPGS.TS Từ Bình Minh là nhà khoa học trong lĩnh vực hóa học. Chỉ trong hai năm 2019, 2020, nhóm nghiên cứu của ông đã công bố trên 20 công trình đăng trên các tạp chí quốc tế thuộc danh mục ISI uy tín, nhiều tạp chí trong số đó thuộc TOP 5% theo lĩnh vực chuyên sâu. Năm 2022, PGS.TS Từ Bình Minh cũng vào top nhà khoa học có ảnh hưởng nhất thế giới.
+# """ 
+
+# print(len(mingg.to_sentences(paragraph=doc)))
