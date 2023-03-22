@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 .venv/
-model/EnBert/en_Bert_onnx
+
 
