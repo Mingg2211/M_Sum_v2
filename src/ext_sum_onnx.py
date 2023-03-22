@@ -5,8 +5,6 @@ import numpy as np
 import sys
 sys.path.append('.')
 import os
-from news_data.crawlNews.crawlNewPaper import crawl_News
-import glob
 from sklearn.metrics.pairwise import cosine_similarity
 from underthesea import sent_tokenize
 import re
