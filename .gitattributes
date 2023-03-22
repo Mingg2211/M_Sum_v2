@@ -1,3 +1,4 @@
 model/ViBert/vi_Bert_onnx/phobert-base.onnx filter=lfs diff=lfs merge=lfs -text
 model/ChBert/ch_Bert_onnx/ch_bert-wwm-ext.onnx filter=lfs diff=lfs merge=lfs -text
 model/RuBert/ru_Bert_onnx/rubert-base-cased.onnx filter=lfs diff=lfs merge=lfs -text
+model/EnBert/en_Bert_onnx/en_bert-base-cased.onnx filter=lfs diff=lfs merge=lfs -text
