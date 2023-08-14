@@ -34,7 +34,7 @@ python src/ext_sum_onnx.py
 ### Abstractive
 ```bash
 python src/abs_sum_onnx.py
-```api
+```
 ### Demo simple app by Streamlit
 ```bash
 python -m streamlit run src/app.py
