@@ -23,6 +23,9 @@ Config the sumy library [sumy](https://pypi.org/project/sumy/)
 python -m pip install -r requirements.txt
 ```
 
+### Download model 
+[https://drive.google.com/drive/u/1/folders/1bARj52b4bzU_uVXYq5OcXj-Rl77pyPkg](https://drive.google.com/drive/u/1/folders/1bARj52b4bzU_uVXYq5OcXj-Rl77pyPkg)
+
 ### Extractive
 ```bash
 python src/ext_sum_onnx.py
@@ -31,8 +34,12 @@ python src/ext_sum_onnx.py
 ### Abstractive
 ```bash
 python src/abs_sum_onnx.py
-```
+```api
 ### Demo simple app by Streamlit
 ```bash
 python -m streamlit run src/app.py
+```
+### API
+```bash
+python src/sum_api.py
 ```

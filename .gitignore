@@ -130,5 +130,7 @@ dmypy.json
 
 .venv/
 
-
-**/model/
+.model/ChBert/ch_Bert_onnx/ch_bert-wwm-ext.onnx
+.model/EnBert/en_Bert_onnx/en_bert-base-cased.onnx
+.model/RuBert/ru_Bert_onnx/rubert-base-cased.onnx
+.model/ViBert/vi_Bert_onnx/phobert-base.onnx
